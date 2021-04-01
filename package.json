@@ -1,0 +1,11 @@
+{
+    "name": "generator-server",
+    "version": "0.1.0",
+    "description": "",
+    "files": [
+        "generators"
+    ],
+    "dependencies": {
+        "yeoman-generator": "^4.13.0"
+    }
+}
