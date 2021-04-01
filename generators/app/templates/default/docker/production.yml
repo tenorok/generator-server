@@ -1,0 +1,71 @@
+version: "3.5"
+
+services:
+<% if (mongodb !== 'no') { -%>
+  <%= project %>-mongo:
+    volumes:
+      - ~/<%= project %>/mongo-data:/data/db
+      - ~/<%= project %>/mongobackup:/root/backup
+
+  <%= project %>-migrator:
+    command: ./node_modules/.bin/pm2-runtime start pm2.config.js --env production
+    environment:
+      - NODE_ENV=production
+
+  <%= project %>-mongodump:
+    image: tenorok/mongodumper:2.0
+    networks:
+      - <%= project %>-network
+    volumes:
+      - ~/<%= project %>/mongobackup:/backup
+    environment:
+      - MONGO_HOST=<%= project %>-mongo
+      - MONGO_DB_NAMES=<%= project %>
+      - BACKUP_EXPIRE_DAYS=14
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "5"
+    restart: always
+
+<% } -%>
+  <%= project %>:
+    command: ./node_modules/.bin/pm2-runtime start pm2.config.js --env production
+    environment:
+      - NODE_ENV=production
+    logging:
+      driver: "fluentd"
+      options:
+        tag: <%= project %>
+        fluentd-async-connect: 'true'
+
+  <%= project %>-nginx:
+    environment:
+      - VIRTUAL_HOST=<%= project %>.ru<%= monitoring ? `,monitor.${project}.ru` : '' %>
+      - LETSENCRYPT_HOST=<%= project %>.ru<%= monitoring ? `,monitor.${project}.ru` : '' %>
+      - LETSENCRYPT_EMAIL=mail@tenorok.ru
+
+  <%= project %>-fluentd:
+    image: registry.gitlab.com/tenorok/excel-bot/fluentd:${TAG}
+    volumes:
+      - ~/<%= project %>/logs:/fluentd/log
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    networks:
+      - <%= project %>-network
+    restart: always
+
+<% if (monitoring) { -%>
+  <%= project %>-prometheus:
+    volumes:
+      - ~/<%= project %>/prometheus-data:/prometheus
+
+  <%= project %>-grafana:
+    volumes:
+      - ~/<%= project %>/grafana-data:/var/lib/grafana
+
+secrets:
+  grafanaPassword:
+    file: ./secrets/prod/grafanaPassword
+<% } -%>

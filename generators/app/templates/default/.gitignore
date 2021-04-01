@@ -1,0 +1,7 @@
+node_modules
+node_modules_production
+dist
+docker/secrets/dev/*
+!docker/secrets/dev/.gitkeep
+docker/secrets/prod/*
+!docker/secrets/prod/.gitkeep

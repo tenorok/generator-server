@@ -1,0 +1,10 @@
+import * as config from 'config';
+import * as bunyan from 'bunyan';
+
+export function createLogger(name: string): bunyan {
+    return bunyan.createLogger({
+        name: '<%= project %>:' + name,
+        src: config.get('log.src'),
+        level: config.get('log.level'),
+    });
+}

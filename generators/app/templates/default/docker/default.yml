@@ -1,0 +1,106 @@
+version: "3.5"
+
+services:
+<% if (mongodb !== 'no') { -%>
+  <%= project %>-mongo:
+    image: registry.gitlab.com/tenorok/<%= project %>/mongo:${TAG}
+    environment:
+      - DUMP_NAME=${DUMP_NAME}
+    networks:
+      - <%= project %>-network
+    logging:
+      options:
+        max-size: "30m"
+        max-file: "10"
+    restart: always
+
+  <%= project %>-migrator:
+    image: registry.gitlab.com/tenorok/<%= project %>/migrator:${TAG}
+    expose:
+      - 2001
+    environment:
+      - MONGO_PORT_27017_TCP_ADDR=<%= project %>-mongo
+      - MONGO_PORT_27017_TCP_PORT=27017
+      - MONGO_DB_NAME=<%= project %>
+    depends_on:
+      - <%= project %>-mongo
+    networks:
+      - <%= project %>-network
+    logging:
+      options:
+        max-size: "30m"
+        max-file: "10"
+    restart: always
+
+<% } -%>
+  <%= project %>:
+    image: registry.gitlab.com/tenorok/<%= project %>:${TAG}
+    expose:
+      - 1001 # приложение
+<% if (monitoring) { -%>
+      - 1002 # ручка метрик приложения для prometheus
+<% } -%>
+    environment:
+      - TZ=Europe/Moscow
+<% if (mongodb !== 'no') { -%>
+      - MONGO_PORT_27017_TCP_ADDR=<%= project %>-mongo
+      - MONGO_PORT_27017_TCP_PORT=27017
+      - MONGO_DB_NAME=<%= project %>
+      - MIGRATOR_HOST=http://<%= project %>-migrator
+<% } -%>
+    depends_on:
+      - <%= project %>-mongo
+      - <%= project %>-migrator
+    networks:
+      - <%= project %>-network
+    restart: always
+
+  <%= project %>-nginx:
+    image: registry.gitlab.com/tenorok/<%= project %>/nginx:${TAG}
+    depends_on:
+      - <%= project %>
+    networks:
+      - <%= project %>-network
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "20"
+    restart: always
+
+<% if (monitoring) { -%>
+  <%= project %>-prometheus:
+    image: registry.gitlab.com/tenorok/<%= project %>/prometheus:${TAG}
+    expose:
+      - 9090
+    networks:
+      - <%= project %>-network
+    logging:
+      options:
+        max-size: "30m"
+        max-file: "10"
+    restart: always
+
+  <%= project %>-grafana:
+    image: grafana/grafana:7.4.3
+    expose:
+      - 3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=feanor
+      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafanaPassword
+      - GF_USERS_ALLOW_SIGN_UP=false
+    secrets:
+      - grafanaPassword
+    networks:
+      - <%= project %>-network
+    depends_on:
+      - <%= project %>-prometheus
+    logging:
+      options:
+        max-size: "30m"
+        max-file: "10"
+    restart: always
+
+<% } -%>
+networks:
+  <%= project %>-network:
+    name: <%= project %>-network

@@ -1,0 +1,33 @@
+version: "3.5"
+
+services:
+<% if (mongodb !== 'no') { -%>
+  <%= project %>-mongo:
+    volumes:
+      - ~/Dropbox/<%= project %>/mongobackup:/root/backup
+
+  <%= project %>-migrator:
+    command: ./node_modules/.bin/pm2-runtime start pm2.config.js --env production
+    environment:
+      - NODE_ENV=production
+
+<% } -%>
+  <%= project %>:
+    command: ./node_modules/.bin/pm2-runtime start pm2.config.js --env production
+    environment:
+      - NODE_ENV=production
+    logging:
+      options:
+        max-size: "30m"
+        max-file: "10"
+
+  <%= project %>-nginx:
+    environment:
+      - VIRTUAL_HOST=<%= project %>.local<%= monitoring ? `,monitor.${project}.local` : '' %>
+    command: [nginx-debug, '-g', 'daemon off;']
+
+<% if (monitoring) { -%>
+secrets:
+  grafanaPassword:
+    file: ./secrets/dev/grafanaPassword
+<% } -%>

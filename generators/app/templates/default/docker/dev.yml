@@ -1,0 +1,39 @@
+version: "3.5"
+
+services:
+<% if (mongodb !== 'no') { -%>
+  <%= project %>-mongo:
+    ports:
+      - "27017:27017"
+
+  <%= project %>-migrator:
+    command: ./node_modules/.bin/pm2-runtime start pm2.config.js --env development
+    volumes:
+      - ../dist:/var/<%= project %>-migrator/dist:ro
+    environment:
+      - DEBUG=*,-require-in-the-middle,-axm:*,-pm2:*
+      - DEBUG_COLORS=1
+      - NODE_ENV=development
+
+<% } -%>
+  <%= project %>:
+    command: ./node_modules/.bin/pm2-runtime start pm2.config.js --env development
+    volumes:
+      - ../dist:/var/<%= project %>/dist:ro
+    environment:
+      - DEBUG=*,-require-in-the-middle,-axm:*,-pm2:*,-follow-redirects
+      - DEBUG_COLORS=1
+      - NODE_ENV=development
+    logging:
+      options:
+        max-size: "30m"
+        max-file: "10"
+
+  <%= project %>-nginx:
+    command: [nginx-debug, '-g', 'daemon off;']
+
+<% if (monitoring) { -%>
+secrets:
+  grafanaPassword:
+    file: ./secrets/dev/grafanaPassword
+<% } -%>
