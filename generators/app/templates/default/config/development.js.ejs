@@ -1,0 +1,22 @@
+// If `NODE_ENV` is not set in the environment, a default value of `development` is used.
+// @see https://github.com/lorenwest/node-config/wiki/Configuration-Files#default-node_env
+
+// const fs = require('fs');
+// Определение запуска в контейнере,
+// if (fs.existsSync('/.dockerenv')) {
+// } else { // иначе локальный запуск в режиме разработки.
+// }
+
+module.exports = {
+<% if (mongodb !== 'no') { -%>
+    mongodb: {
+        host: process.env.MONGO_PORT_27017_TCP_ADDR || 'localhost',
+        port: process.env.MONGO_PORT_27017_TCP_PORT || '27017',
+        db: process.env.MONGO_DB_NAME || '<%= project %>',
+    },
+<% } -%>
+    log: {
+        src: true,
+        level: 'trace',
+    },
+};

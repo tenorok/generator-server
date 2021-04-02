@@ -11,6 +11,8 @@ const log = createLogger('unhandledRejection');
 process.on('unhandledRejection', (error) => {
     log.error(error);
 });
+
+// Application code...
 <% if (monitoring) { -%>
 
 // Мониторинг должен подключаться строго в конце.

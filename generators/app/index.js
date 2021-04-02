@@ -31,8 +31,16 @@ module.exports = class extends Generator {
     }
 
     writing() {
+        this._copyTpl('default');
+
+        if (this.answers.monitoring) {
+            this._copyTpl('monitoring');
+        }
+    }
+
+    _copyTpl(from) {
         this.fs.copyTpl(
-            this.templatePath('default'),
+            this.templatePath(from),
             this.destinationPath(),
             {
                 project: this.answers.project,

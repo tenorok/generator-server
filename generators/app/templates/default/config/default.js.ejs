@@ -1,0 +1,23 @@
+// const secrets = require('../docker/secrets/get')();
+
+module.exports = {
+    '<%= project %>': {
+        port: 1001,
+    },
+<% if (mongodb !== 'no') { -%>
+    migrator: {
+        host: process.env.MIGRATOR_HOST || 'http://localhost',
+        port: 2001,
+    },
+<% } -%>
+<% if (monitoring) { -%>
+    prometheus: {
+        port: 1002,
+    },
+<% } -%>
+    server: {
+        user: 'root',
+        ip: 'SERVER_IP_ADDRESS',
+        dumpsdir: '/root/<%= project %>/mongobackup',
+    },
+};

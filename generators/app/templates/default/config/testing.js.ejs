@@ -1,0 +1,15 @@
+// Конфиг используется только для юнит-тестов.
+
+module.exports = {
+<% if (mongodb !== 'no') { -%>
+    mongodb: {
+        host: 'localhost',
+        port: '27017',
+        db: '<%= project %>-test',
+    },
+<% } -%>
+    log: {
+        src: true,
+        level: 'warn',
+    },
+};
