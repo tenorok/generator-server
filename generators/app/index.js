@@ -33,6 +33,10 @@ module.exports = class extends Generator {
     writing() {
         this._copyTpl('default');
 
+        if (this.answers.mongodb) {
+            this._copyTpl('mongodb');
+        }
+
         if (this.answers.monitoring) {
             this._copyTpl('monitoring');
         }
