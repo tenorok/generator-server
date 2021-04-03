@@ -1,4 +1,4 @@
-FROM node:12.18.3-alpine3.12
+FROM node:<%= nodejs %>-alpine3.12
 
 RUN apk add --no-cache tzdata && \
     mkdir /var/<%= project %>

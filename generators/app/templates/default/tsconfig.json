@@ -23,10 +23,13 @@
         ],
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "baseUrl": "."
+        "baseUrl": ".",
+        "paths": {
+            "@common/*": ["common/src/*"]
+        }
     },
     "include": [
-        "src/**/*.ts"
+        "**/src/**/*.ts"
     ],
     "exclude": [
         "node_modules",

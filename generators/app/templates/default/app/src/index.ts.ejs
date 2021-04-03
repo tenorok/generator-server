@@ -1,12 +1,12 @@
 <% if (mongodb !== 'no') { -%>
-import db from './DB/instance';
+import db from '@common/DB/instance';
 // Активировать бесконечное время жизни кэша запросов БД.
 // db.cacheTTL = 0;
 
-import './DB/migration';
+import '@common/DB/migration';
 
 <% } -%>
-import { createLogger } from './Logger';
+import { createLogger } from '@common/Logger';
 const log = createLogger('unhandledRejection');
 process.on('unhandledRejection', (error) => {
     log.error(error);
@@ -16,5 +16,5 @@ process.on('unhandledRejection', (error) => {
 <% if (monitoring) { -%>
 
 // Мониторинг должен подключаться строго в конце.
-import './Prometheus';
+import '@common/Prometheus';
 <% } -%>
