@@ -1,0 +1,36 @@
+{
+    "name": "<%= project %>",
+    "private": true,
+    "repository": {
+        "type": "git",
+        "url": "https://gitlab.com/tenorok/<%= project %>.git"
+    },
+    "engines": {
+        "node": "<%= nodejs %>",
+        "npm": "<%= npm %>"<% if (mongodb !== 'no') { -%>,
+        "mongodb": "<%= mongodb %>"<% } %>
+    },
+    "scripts": {
+        "prettier": "prettier --write .",
+        "task": "node ./tasksfile.js"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "author": {
+        "name": "Artem Kurbatov",
+        "email": "mail@tenorok.ru",
+        "homepage": "https://tenorok.ru"
+    },
+<% if (mongodb !== 'no') { -%>
+    "config": {
+        "migration": 0
+    },
+<% } -%>
+    "dependencies": {
+    },
+    "devDependencies": {
+    }
+}

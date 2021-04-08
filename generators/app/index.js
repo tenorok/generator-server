@@ -15,6 +15,11 @@ module.exports = class extends Generator {
                 default: '12.18.3',
             },
             {
+                name: 'npm',
+                message: 'NPM version:',
+                default: '6.14.6',
+            },
+            {
                 name: 'mongodb',
                 message: 'MongoDB version or «no»:',
                 default: '4.0.2',
@@ -33,7 +38,7 @@ module.exports = class extends Generator {
     writing() {
         this._copyTpl('default');
 
-        if (this.answers.mongodb) {
+        if (this.answers.mongodb !== 'no') {
             this._copyTpl('mongodb');
         }
 
@@ -46,12 +51,7 @@ module.exports = class extends Generator {
         this.fs.copyTpl(
             this.templatePath(from),
             this.destinationPath(),
-            {
-                project: this.answers.project,
-                nodejs: this.answers.nodejs,
-                mongodb: this.answers.mongodb,
-                monitoring: this.answers.monitoring,
-            },
+            this.answers,
             {},
             { globOptions: { dot: true } }
         );
