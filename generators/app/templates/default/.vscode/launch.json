@@ -23,6 +23,29 @@
             "sourceMaps": true,
             "skipFiles": ["<node_internals>/**"],
             "protocol": "inspector"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "test",
+            "cwd": "${workspaceRoot}",
+            "runtimeExecutable": "${env:HOME}/.nvm/v<%= nodejs %>/bin/node",
+            "env": {
+                "NODE_ENV": "testing"
+            },
+            "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "--compilers", "ts:ts-node/register",
+                "--recursive",
+                "test/"
+            ],
+            "runtimeArgs": [
+                "--nolazy",
+                "--preserve-symlinks",
+            ],
+            "sourceMaps": true,
+            "skipFiles": ["<node_internals>/**"],
+            "protocol": "inspector"
         }
     ]
 }
