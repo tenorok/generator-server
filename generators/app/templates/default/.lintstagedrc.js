@@ -1,5 +1,6 @@
 module.exports = {
-    '*': () => 'tsc -p tsconfig.json --noEmit',
+    "*.{js,jsx,ts,tsx}": "eslint",
+    "*.{js,jsx,ts,tsx,json,html,css,scss,md}": "prettier --write",
     '*': () => 'madge --circular --extensions ts ./src/',
-    "*.{js,jsx,ts,tsx,json,html,css,scss,md}": "prettier --write"
+    '*': () => 'tsc -p tsconfig.json --incremental false --noEmit',
 }
