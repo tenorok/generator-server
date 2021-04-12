@@ -170,7 +170,7 @@ help(
         options: {
             mongorestore: 'Restore MongoDB from last dropbox dump',
         },
-    }
+    },
 <% } -%>
 );
 help(docker.compose.production, 'Run docker-compose with production config', {

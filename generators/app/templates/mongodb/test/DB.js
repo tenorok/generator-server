@@ -4,7 +4,7 @@ const assert = chai.assert;
 const sinon = require('sinon');
 const mongoose = require('mongoose');
 const cachegoose = require('cachegoose');
-const db = require('../src/DB/instance').default;
+const db = require('../common/src/DB/instance').default;
 db.cacheTTL = 0;
 
 const modelsAndCollections = [

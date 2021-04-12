@@ -27,7 +27,9 @@
         "require-await": ["error"],
         "comma-spacing": ["error", { "before": false, "after": true }],
         "quote-props": ["error", "as-needed"],
-        "quotes": ["error", "single"],
+        "quotes": ["error", "single", {
+            "avoidEscape": true
+        }],
         "no-unused-expressions": ["error"],
         "default-param-last": ["error"],
         "dot-notation": ["error"],
@@ -51,6 +53,8 @@
                 "@typescript-eslint/ban-ts-comment": "off",
                 "@typescript-eslint/no-floating-promises": "off",
                 "@typescript-eslint/no-empty-interface": "off",
+                "no-duplicate-imports": "off",
+                "@typescript-eslint/no-duplicate-imports": ["error"],
                 "@typescript-eslint/unbound-method": ["error", { "ignoreStatic": true }],
                 "@typescript-eslint/member-delimiter-style": ["error"],
                 "@typescript-eslint/member-ordering": ["error"],

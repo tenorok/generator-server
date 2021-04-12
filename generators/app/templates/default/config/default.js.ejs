@@ -2,7 +2,7 @@
 
 module.exports = {
     '<%= project %>': {
-        port: 1001,
+        port: 4001,
     },
 <% if (mongodb !== 'no') { -%>
     migrator: {
@@ -12,7 +12,7 @@ module.exports = {
 <% } -%>
 <% if (monitoring) { -%>
     prometheus: {
-        port: 1002,
+        port: 4002,
     },
 <% } -%>
     server: {

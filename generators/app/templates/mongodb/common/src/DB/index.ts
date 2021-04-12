@@ -2,9 +2,8 @@ import * as config from 'config';
 import * as mongoose from 'mongoose';
 import beautifyUnique = require('mongoose-beautiful-unique-validation');
 import cachegoose = require('cachegoose');
+import type { IUser, IUserModel } from './models/User';
 import {
-    IUser,
-    IUserModel,
     UserModel,
     getByIdCacheKey as getUserByIdCacheKey,
 } from './models/User';
@@ -45,8 +44,8 @@ export default class DB {
         this._cacheTTL = value;
     }
 
-    public async destructor(): Promise<[void, Error]> {
-        return Promise.all<void, Error>([
+    public async destructor(): Promise<[void, void | Error]> {
+        return Promise.all<void, void | Error>([
             this.connection.close(),
             new Promise((resolve) => {
                 cachegoose.clearCache(null, resolve);
@@ -66,7 +65,7 @@ export default class DB {
     public async findUserById(userId: ObjectId): Promise<IUserModel | null> {
         return (await this.models.user)
             .findById(userId)
-            .lean({ defaults: true })
+            .lean<IUserModel>({ defaults: true })
             .cache(this._cacheTTL, getUserByIdCacheKey(userId))
             .exec()
             .catch((err) => {

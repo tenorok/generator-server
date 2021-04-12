@@ -9,9 +9,9 @@ const log = createLogger('Migrator');
 
 const migrator = express();
 
-const mongoHost = config.get('mongodb.host');
-const mongoPort = config.get('mongodb.port');
-const mongoDb = config.get('mongodb.db');
+const mongoHost = config.get<string>('mongodb.host');
+const mongoPort = config.get<string>('mongodb.port');
+const mongoDb = config.get<string>('mongodb.db');
 
 const migrateMongoose = new MigrateMongoose({
     migrationsPath: path.resolve(__dirname, 'migrations'),
@@ -23,7 +23,10 @@ migrator.get('/migrate/:version', async (req, res) => {
     // Перед получением списка миграций migrate-mongoose выполняет синхронизацию,
     // поэтому отдельный вызов `sync()` не требуется.
     const migrationsList = await migrateMongoose.list();
-    const lastApplied = findLast(migrationsList, (migration) => migration.state === 'up');
+    const lastApplied = findLast<MigrateMongoose.MigrationData>(
+        migrationsList,
+        (migration) => migration.state === 'up',
+    );
     const lastAppliedVersion = lastApplied ? parseInt(lastApplied.name, 10) : 0;
 
     const targetVersion: number = parseInt(req.params.version, 10);
@@ -52,7 +55,7 @@ migrator.get('/migrate/:version', async (req, res) => {
         });
 });
 
-const port = config.get('migrator.port');
+const port = config.get<number>('migrator.port');
 migrator.listen(port, () => {
     log.info(`Process listening at port ${port}`);
 });

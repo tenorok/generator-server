@@ -14,7 +14,7 @@ prom.get('/metrics', async (_, res) => {
     res.end(await client.register.metrics());
 });
 
-const port = config.get('prometheus.port');
+const port = config.get<number>('prometheus.port');
 prom.listen(port, () => {
     log.info(`Process listening at port ${port}`);
 });

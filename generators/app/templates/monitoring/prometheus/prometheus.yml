@@ -3,4 +3,4 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets:
-          - '<%= project %>:1002'
+          - '<%= project %>:4002'

@@ -14,14 +14,14 @@ function test(options, testPath) {
         'NODE_ENV=testing mocha',
         '--require error-stack-handler',
         '--recursive',
-        '--compilers ts:ts-node/register',
+        '--compilers ts:ts-node/register,tsconfig-paths/register',
         `${reporterFlag} ${path}`,
     );
 
     sh(cmd.join(' '));
 }
 
-test.watch = function(testPath) {
+test.watch = function(options, testPath) {
     const { skipts } = options;
     const mask = testPath || 'test/**/*.js';
     const path = testPath || 'test/';

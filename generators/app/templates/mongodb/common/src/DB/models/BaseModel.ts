@@ -1,4 +1,4 @@
-import { Connection, Document, Schema, Model } from 'mongoose';
+import type { Connection, Document, Schema, Model } from 'mongoose';
 
 import { createLogger } from '@common/Logger';
 const log = createLogger('DB:BaseModel');

@@ -1,6 +1,7 @@
-import { SetOptional } from 'type-fest';
-import { MongoError } from 'mongodb';
-import { Document, Schema, NativeError } from 'mongoose';
+import type { SetOptional } from 'type-fest';
+import type { MongoError } from 'mongodb';
+import type { Document, NativeError } from 'mongoose';
+import { Schema } from 'mongoose';
 import cachegoose = require('cachegoose');
 import mongooseLeanDefaults = require('mongoose-lean-defaults');
 import { v4 as uuidv4 } from 'uuid';
@@ -74,5 +75,5 @@ export class UserModel extends BaseModel<IUserModel> {
 }
 
 export function getByIdCacheKey(userId: ObjectId): string {
-    return userId + '-userid';
+    return String(userId) + '-userid';
 }

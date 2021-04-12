@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 declare module 'cachegoose' {
-    import * as mongoose from 'mongoose';
+    import type * as mongoose from 'mongoose';
 
     namespace Cachegoose {
         export function clearCache(

@@ -36,9 +36,9 @@ services:
   <%= project %>:
     image: registry.gitlab.com/tenorok/<%= project %>:${TAG}
     expose:
-      - 1001 # приложение
+      - 4001 # приложение
 <% if (monitoring) { -%>
-      - 1002 # ручка метрик приложения для prometheus
+      - 4002 # ручка метрик приложения для prometheus
 <% } -%>
     environment:
       - TZ=Europe/Moscow

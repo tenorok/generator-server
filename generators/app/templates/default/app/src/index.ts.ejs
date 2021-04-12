@@ -1,7 +1,7 @@
 <% if (mongodb !== 'no') { -%>
-import db from '@common/DB/instance';
+import _db from '@common/DB/instance';
 // Активировать бесконечное время жизни кэша запросов БД.
-// db.cacheTTL = 0;
+// _db.cacheTTL = 0;
 
 import '@common/DB/migration';
 

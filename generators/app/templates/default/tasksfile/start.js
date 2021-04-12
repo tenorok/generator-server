@@ -15,11 +15,11 @@ function runStart(command) {
 }
 
 function start() {
-    runStart('ts-node ./src/index.ts');
+    runStart('ts-node --require tsconfig-paths/register ./app/src/index.ts');
 }
 
-start.watch = function() {
-    runStart('nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts');
+start.watch = function () {
+    runStart('nodemon --exec ./node_modules/.bin/ts-node -- --require tsconfig-paths/register ./app/src/index.ts');
 };
 
 help(start, 'Start application');

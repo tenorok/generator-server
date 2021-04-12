@@ -19,6 +19,7 @@
                 "--nolazy",
                 "--preserve-symlinks",
                 "-r", "ts-node/register",
+                "-r", "tsconfig-paths/register",
             ],
             "sourceMaps": true,
             "skipFiles": ["<node_internals>/**"],
@@ -35,7 +36,7 @@
             },
             "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
             "args": [
-                "--compilers", "ts:ts-node/register",
+                "--compilers", "ts:ts-node/register,tsconfig-paths/register",
                 "--recursive",
                 "test/"
             ],

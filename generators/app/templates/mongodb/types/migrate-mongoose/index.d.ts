@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 declare module 'migrate-mongoose' {
     namespace MigrateMongoose {
         type Direction = 'up' | 'down';
@@ -21,7 +22,10 @@ declare module 'migrate-mongoose' {
 
         public sync(): Promise;
         public list(): Promise<MigrationData[]>;
-        public run(direction: Direction, migrationName: string): Promise;
+        public run(
+            direction: Direction,
+            migrationName: string,
+        ): Promise<unknown[]>;
     }
 
     export = MigrateMongoose;
