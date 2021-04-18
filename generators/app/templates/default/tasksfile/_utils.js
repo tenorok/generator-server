@@ -33,10 +33,40 @@ class Command {
     }
 }
 
+<% if (mongodb !== 'no') { -%>
+const os = require('os');
+const config = require('config');
+const DROPBOX_DUMP_DIR = `${os.homedir()}/Dropbox/<%= project %>/app-mongobackup`;
+
+function lastFileCommand(dir) {
+    return `ls -lat ${dir} | grep ".gz$" | head -1 | awk '{print $9}'`;
+}
+
+/** Получить путь до последнего дампа БД из дропбокса. */
+function getDropboxLastDumpName() {
+    return sh(lastFileCommand(DROPBOX_DUMP_DIR), {
+        stdio: 'pipe',
+    }).trim();
+};
+
+/** Получить имя последнего дампа БД на сервере. */
+function getLastDumpName() {
+    const { dumpsdir } = config.get('server');
+
+    return sh(lastFileCommand(dumpsdir), {
+        stdio: 'pipe',
+    }).trim();
+};
+
+<% } -%>
 module.exports = {
     sh,
     shPipe,
     help,
     DAY,
     Command,
+    DROPBOX_DUMP_DIR,
+    lastFileCommand,
+    getDropboxLastDumpName,
+    getLastDumpName,
 };

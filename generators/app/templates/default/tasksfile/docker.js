@@ -3,42 +3,80 @@ const {
     shPipe,
     help,
     Command,
+    getDropboxLastDumpName,
+    getLastDumpName,
 } = require('./_utils');
-<% if (mongodb !== 'no') { -%>
-const db = require('./db');
-<% } -%>
 const moment = require('moment');
 
-const IMAGE_APP = 'registry.gitlab.com/tenorok/<%= project %>';
+const IMAGE_APP = 'registry.gitlab.com/tenorok/test-project';
+const IMAGE_MIGRATOR = 'registry.gitlab.com/tenorok/test-project/migrator';
+const IMAGE_NGINX = 'registry.gitlab.com/tenorok/test-project/nginx';
+const IMAGE_MONGO = 'registry.gitlab.com/tenorok/test-project/mongo';
+const IMAGE_FLUENTD = 'registry.gitlab.com/tenorok/test-project/fluentd';
+const IMAGE_PROMETHEUS = 'registry.gitlab.com/tenorok/test-project/prometheus';
 const IMAGES = [
     IMAGE_APP,
+    IMAGE_MIGRATOR,
+    IMAGE_NGINX,
+    IMAGE_MONGO,
+    IMAGE_FLUENTD,
+    IMAGE_PROMETHEUS,
 ];
 
-function prepareSources() {
-    sh('rm -rf dist');
-    sh('tsc');
-
+function prepareNodeModules() {
     sh('rm -rf node_modules_production');
     sh('mkdir node_modules_production');
     sh('cp package.json node_modules_production/');
     sh('cp package-lock.json node_modules_production/');
-    sh(
-        'npm ci --production --prefix node_modules_production ./node_modules_production',
-    );
+    sh('npm ci --production --prefix node_modules_production ./node_modules_production');
+
+    // TypeScript не резолвит пути из compilerOptions.paths в скомпилированном коде.
+    sh('ln -s ../dist/common/src node_modules_production/node_modules/@common');
 }
 
 const docker = {
-    build() {
-        prepareSources();
+    app() {
+        prepareNodeModules();
 
-        sh(`docker build --squash -t ${IMAGE_APP} .`);
+        sh('rm -rf app/dist');
+        sh('tsc -p app/tsconfig.json');
+        sh(`docker build --squash -t ${IMAGE_APP} -f app/Dockerfile .`);
+    },
+    migrator() {
+        prepareNodeModules();
+
+        sh('rm -rf migrator/dist');
+        sh('tsc -p migrator/tsconfig.json');
+        sh(`docker build --squash -t ${IMAGE_MIGRATOR} -f migrator/Dockerfile .`);
+    },
+    nginx() {
+        sh(`docker build --squash -t ${IMAGE_NGINX} ./nginx`);
+    },
+    mongo() {
+        sh(`docker build --squash -t ${IMAGE_MONGO} ./mongo`);
+    },
+    fluentd() {
+        sh(`docker build --squash -t ${IMAGE_FLUENTD} ./fluentd`);
+    },
+    prometheus() {
+        sh(`docker build --squash -t ${IMAGE_PROMETHEUS} ./prometheus`);
+    },
+    all() {
+        prepareNodeModules();
+
+        docker.image.app();
+        docker.image.migrator();
+        docker.image.nginx();
+        docker.image.mongo();
+        docker.image.fluentd();
+        docker.image.prometheus();
     },
     compose: {
         dev(options) {
             const { build } = options;
 
             if (build) {
-                docker.build();
+                docker.app();
             }
 
             sh(
@@ -54,7 +92,7 @@ const docker = {
 
 <% if (mongodb !== 'no') { -%>
             if (mongorestore) {
-                cmd.env('DUMP_NAME', db.getDropboxLastDumpName());
+                cmd.env('DUMP_NAME', getDropboxLastDumpName());
             }
 
 <% } -%>
@@ -72,7 +110,7 @@ const docker = {
 
 <% if (mongodb !== 'no') { -%>
             if (mongorestore) {
-                cmd.env('DUMP_NAME', db.getLastDumpName());
+                cmd.env('DUMP_NAME', getLastDumpName());
             }
 
 <% } -%>
@@ -97,7 +135,7 @@ const docker = {
         });
     },
     push() {
-        docker.build();
+        docker.app();
 
         const tag = moment().format('DD.MM.YYYY-HH.mm');
         IMAGES.forEach((image) => {
@@ -156,7 +194,13 @@ const docker = {
     },
 };
 
-help(docker.build, 'Build docker image');
+help(docker.app, 'Build main app docker image');
+help(docker.migrator, 'Build migrator docker image');
+help(docker.nginx, 'Build nginx docker image');
+help(docker.mongo, 'Build mongo docker image');
+help(docker.fluentd, 'Build fluentd docker image');
+help(docker.prometheus, 'Build prometheus docker image');
+help(docker.all, 'Build all docker images');
 help(docker.compose.dev, 'Run docker-compose with development config', {
     options: {
         build: 'Build images before run compose',

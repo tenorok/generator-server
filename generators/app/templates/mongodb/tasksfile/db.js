@@ -1,13 +1,11 @@
-const os = require('os');
 const config = require('config');
-const { sh, help } = require('./_utils');
+const {
+    sh,
+    help,
+    lastFileCommand,
+    DROPBOX_DUMP_DIR,
+} = require('./_utils');
 const migration = require('../migrator/runfile/migration');
-
-const DROPBOX_DIR = `${os.homedir()}/Dropbox/<%= project %>/app-mongobackup`;
-
-function lastFileCommand(dir) {
-    return `ls -lat ${dir} | grep ".gz$" | head -1 | awk '{print $9}'`;
-}
 
 const db = {
     dump: {
@@ -41,7 +39,7 @@ const db = {
                 stdio: 'pipe',
             }).trim();
 
-            const dest = dropbox ? DROPBOX_DIR : '.';
+            const dest = dropbox ? DROPBOX_DUMP_DIR : '.';
 
             sh(`scp ${user}@${ip}:${dumpsdir}/${dump} ${dest}`);
 
@@ -78,19 +76,3 @@ help(db.restore, 'Restore local MongoDB from dump', {
 });
 
 module.exports = db;
-
-/** Получить путь до последнего дампа БД из дропбокса. */
-module.exports.getDropboxLastDumpName = function() {
-    return sh(lastFileCommand(DROPBOX_DIR), {
-        stdio: 'pipe',
-    }).trim();
-};
-
-/** Получить имя последнего дампа БД на сервере. */
-module.exports.getLastDumpName = function() {
-    const { dumpsdir } = config.get('server');
-
-    return sh(lastFileCommand(dumpsdir), {
-        stdio: 'pipe',
-    }).trim();
-};

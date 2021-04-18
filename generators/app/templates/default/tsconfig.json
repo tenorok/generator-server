@@ -7,7 +7,6 @@
             "es2019"
         ],
         "sourceMap": true,
-        "outDir": "dist",
         "incremental": true,
         /* Strict Type-Checking Options */
         "strict": true,
