@@ -14,15 +14,17 @@ function runStart(command) {
     ].join(' '));
 }
 
-function start() {
-    runStart('ts-node --require tsconfig-paths/register ./app/src/index.ts');
-}
+const start = {
+    default() {
+        runStart('ts-node --require tsconfig-paths/register ./app/src/index.ts');
+    },
 
-start.watch = function () {
-    runStart('nodemon --exec ./node_modules/.bin/ts-node -- --require tsconfig-paths/register ./app/src/index.ts');
+    watch() {
+        runStart('nodemon --exec ./node_modules/.bin/ts-node -- --require tsconfig-paths/register ./app/src/index.ts');
+    },
 };
 
-help(start, 'Start application');
+help(start.default, 'Start application');
 help(start.watch, 'Start application and restart on every changing');
 
 module.exports = start;

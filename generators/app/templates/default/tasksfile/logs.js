@@ -6,102 +6,104 @@ const { sh, help, DAY } = require('./_utils');
 
 const LOGS_DIR = `${os.homedir()}/<%= project %>/logs/`;
 
-function logs(options) {
-    const {
-        date,
-        lines,
-    } = options;
+const logs = {
+    default(options) {
+        const {
+            date,
+            lines,
+        } = options;
 
-    if (date) {
-        const logsListInfo = logsList();
-        const requestedDate = new Date(date).getTime();
-        const fileList = logsListInfo
-            .filter((fileInfo) => fileInfo.date === requestedDate)
-            .map((fileInfo) => {
-                return path.join(LOGS_DIR, fileInfo.fileName);
-            });
-        let command = `cat ${fileList.join(' ')}`;
+        if (date) {
+            const logsListInfo = logsList();
+            const requestedDate = new Date(date).getTime();
+            const fileList = logsListInfo
+                .filter((fileInfo) => fileInfo.date === requestedDate)
+                .map((fileInfo) => {
+                    return path.join(LOGS_DIR, fileInfo.fileName);
+                });
+            let command = `cat ${fileList.join(' ')}`;
+
+            if (lines) {
+                command += ` | tail -n ${lines}`;
+            }
+
+            sh(command += ' | ./node_modules/.bin/bunyan --time local');
+            return;
+        }
+
+        const bufferFile = getBuffer();
+        if (!bufferFile) {
+            // eslint-disable-next-line no-console
+            console.log('Buffer does\'t exists');
+            return;
+        }
+        let command = 'tail';
 
         if (lines) {
-            command += ` | tail -n ${lines}`;
+            command += ` -n ${lines}`;
         }
 
-        sh(command += ' | ./node_modules/.bin/bunyan --time local');
-        return;
-    }
+        sh(command + ` -f ${path.join(LOGS_DIR, bufferFile)} | ./node_modules/.bin/bunyan --time local`);
+    },
 
-    const bufferFile = getBuffer();
-    if (!bufferFile) {
+    list() {
+        const logsListInfo = logsList();
+
+        if (!logsListInfo.length) {
+            // eslint-disable-next-line no-console
+            console.log('Logs does\'t exists');
+            return;
+        }
+
+        const list = [];
+        let currentDate = logsListInfo[0];
+        let currentIndexes = [];
+        for (let i = 0; i <= logsListInfo.length; i++) {
+            const fileInfo = logsListInfo[i];
+
+            if (i === logsListInfo.length || fileInfo.date !== currentDate.date) {
+                const date = new Date(currentDate.date).toISOString().substr(0, 10);
+                list.push(`- ${date} ${collapse(currentIndexes)}`);
+                currentDate = fileInfo;
+                currentIndexes = [];
+            }
+
+            if (fileInfo) {
+                currentIndexes.push(fileInfo.index);
+            }
+        }
+
         // eslint-disable-next-line no-console
-        console.log('Buffer does\'t exists');
-        return;
-    }
-    let command = 'tail';
+        console.log(list.join('\n'));
+    },
 
-    if (lines) {
-        command += ` -n ${lines}`;
-    }
+    prune(options) {
+        const { days = 14 } = options;
+        const list = [];
+        const filesList = fs.readdirSync(LOGS_DIR);
+        const pruneTime = Date.now() - days * DAY;
 
-    sh(command + ` -f ${path.join(LOGS_DIR, bufferFile)} | ./node_modules/.bin/bunyan --time local`);
-}
+        for (const fileName of filesList) {
+            const fileInfo = fileName.match(logRegexp);
+            if (!fileInfo) {
+                continue;
+            }
 
-logs.list = function() {
-    const logsListInfo = logsList();
+            const fileTime = new Date(fileInfo[1]).getTime();
 
-    if (!logsListInfo.length) {
-        // eslint-disable-next-line no-console
-        console.log('Logs does\'t exists');
-        return;
-    }
-
-    const list = [];
-    let currentDate = logsListInfo[0];
-    let currentIndexes = [];
-    for (let i = 0; i <= logsListInfo.length; i++) {
-        const fileInfo = logsListInfo[i];
-
-        if (i === logsListInfo.length || fileInfo.date !== currentDate.date) {
-            const date = new Date(currentDate.date).toISOString().substr(0, 10);
-            list.push(`- ${date} ${collapse(currentIndexes)}`);
-            currentDate = fileInfo;
-            currentIndexes = [];
+            if (fileTime < pruneTime) {
+                list.push(path.join(LOGS_DIR, fileName));
+            }
         }
 
-        if (fileInfo) {
-            currentIndexes.push(fileInfo.index);
-        }
-    }
-
-    // eslint-disable-next-line no-console
-    console.log(list.join('\n'));
-};
-
-logs.prune = function(options) {
-    const { days = 14 } = options;
-    const list = [];
-    const filesList = fs.readdirSync(LOGS_DIR);
-    const pruneTime = Date.now() - days * DAY;
-
-    for (const fileName of filesList) {
-        const fileInfo = fileName.match(logRegexp);
-        if (!fileInfo) {
-            continue;
+        if (!list.length) {
+            // eslint-disable-next-line no-console
+            console.log('Nothing to prune');
+            return;
         }
 
-        const fileTime = new Date(fileInfo[1]).getTime();
-
-        if (fileTime < pruneTime) {
-            list.push(path.join(LOGS_DIR, fileName));
-        }
-    }
-
-    if (!list.length) {
-        // eslint-disable-next-line no-console
-        console.log('Nothing to prune');
-        return;
-    }
-
-    sh(`rm ${list.join(' ')}`);
+        sh(`rm ${list.join(' ')}`);
+    },
 };
 
 const logRegexp = /^app\.(\d{4}-\d{2}-\d{2})_(\d+)\.log$/;
@@ -169,7 +171,7 @@ function collapse(indexes) {
     return `(${intervals.join(',')})`;
 }
 
-help(logs, 'Print and follow current logs', {
+help(logs.default, 'Print and follow current logs', {
     options: {
         date: 'Print logs for a certain date (example: 2020-07-28)',
         lines: 'Number of lines to output',

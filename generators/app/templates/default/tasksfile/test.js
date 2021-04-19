@@ -1,47 +1,49 @@
 const { sh, help } = require('./_utils');
 
-function test(options, testPath) {
-    const { reporter, skipts } = options;
-    const reporterFlag = reporter ? `--reporter=${reporter}` : '';
-    const path = testPath || 'test/';
-    const cmd = [];
+const test = {
+    default(options, testPath) {
+        const { reporter, skipts } = options;
+        const reporterFlag = reporter ? `--reporter=${reporter}` : '';
+        const path = testPath || 'test/';
+        const cmd = [];
 
-    if (skipts) {
-        cmd.push('TS_NODE_LOG_ERROR=true');
-    }
+        if (skipts) {
+            cmd.push('TS_NODE_LOG_ERROR=true');
+        }
 
-    cmd.push(
-        'NODE_ENV=testing mocha',
-        '--require error-stack-handler',
-        '--recursive',
-        '--compilers ts:ts-node/register,tsconfig-paths/register',
-        `${reporterFlag} ${path}`,
-    );
+        cmd.push(
+            'NODE_ENV=testing mocha',
+            '--require error-stack-handler',
+            '--recursive',
+            '--compilers ts:ts-node/register,tsconfig-paths/register',
+            `${reporterFlag} ${path}`,
+        );
 
-    sh(cmd.join(' '));
-}
+        sh(cmd.join(' '));
+    },
 
-test.watch = function(options, testPath) {
-    const { skipts } = options;
-    const mask = testPath || 'test/**/*.js';
-    const path = testPath || 'test/';
-    const cmd = [];
+    watch(options, testPath) {
+        const { skipts } = options;
+        const mask = testPath || 'test/**/*.js';
+        const path = testPath || 'test/';
+        const cmd = [];
 
-    if (skipts) {
-        cmd.push('TS_NODE_LOG_ERROR=true');
-    }
+        if (skipts) {
+            cmd.push('TS_NODE_LOG_ERROR=true');
+        }
 
-    cmd.push(
-        'NODE_ENV=testing chokidar',
-        `"src/**/*.ts" "${mask}"`,
-        `-c "run test --reporter=dot ${path}"`,
-        '--initial',
-    );
+        cmd.push(
+            'NODE_ENV=testing chokidar',
+            `"src/**/*.ts" "${mask}"`,
+            `-c "run test --reporter=dot ${path}"`,
+            '--initial',
+        );
 
-    sh(cmd.join(' '));
+        sh(cmd.join(' '));
+    },
 };
 
-help(test, 'Run unit tests', {
+help(test.default, 'Run unit tests', {
     params: ['path'],
     options: {
         reporter: 'Mocha reporter (npx mocha --list-reporters)',
