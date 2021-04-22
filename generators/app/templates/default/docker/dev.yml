@@ -9,7 +9,7 @@ services:
   <%= project %>-migrator:
     command: ./node_modules/.bin/pm2-runtime start pm2.config.js --env development
     volumes:
-      - ../dist:/var/<%= project %>-migrator/dist:ro
+      - ../migrator/dist:/var/<%= project %>-migrator/dist:ro
     environment:
       - DEBUG=*,-require-in-the-middle,-axm:*,-pm2:*
       - DEBUG_COLORS=1
@@ -19,7 +19,7 @@ services:
   <%= project %>:
     command: ./node_modules/.bin/pm2-runtime start pm2.config.js --env development
     volumes:
-      - ../dist:/var/<%= project %>/dist:ro
+      - ../app/dist:/var/<%= project %>/dist:ro
     environment:
       - DEBUG=*,-require-in-the-middle,-axm:*,-pm2:*,-follow-redirects
       - DEBUG_COLORS=1

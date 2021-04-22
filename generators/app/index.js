@@ -120,12 +120,23 @@ module.exports = class extends Generator {
             },
         };
 
+        if (this.answers.mongodb !== 'no' || this.answers.monitoring) {
+            packages.dependencies = {
+                ...packages.dependencies,
+                "express": "4.16.4",
+            };
+
+            packages.devDependencies = {
+                ...packages.devDependencies,
+                "@types/express": "4.16.1",
+            };
+        }
+
         if (this.answers.mongodb !== 'no') {
             packages.dependencies = {
                 ...packages.dependencies,
                 "axios": "0.19.2",
                 "axios-debug-log": "0.6.2",
-                "express": "4.16.4",
                 "mongoose": "5.7.13",
                 "mongoose-beautiful-unique-validation": "7.1.1",
                 "mongoose-lean-defaults": "0.3.2",
@@ -136,7 +147,6 @@ module.exports = class extends Generator {
             packages.devDependencies = {
                 ...packages.devDependencies,
                 "@types/axios": "0.14.0",
-                "@types/express": "4.16.1",
                 "@types/mongoose": "5.7.13",
             };
 

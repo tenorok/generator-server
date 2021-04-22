@@ -3,8 +3,10 @@ const {
     shPipe,
     help,
     Command,
+<% if (mongodb !== 'no') { -%>
     getDropboxLastDumpName,
     getLastDumpName,
+<% } -%>
 } = require('./_utils');
 const moment = require('moment');
 
@@ -83,7 +85,7 @@ const docker = {
                 'TAG=latest docker-compose -f docker/default.yml -f docker/dev.yml up',
             );
         },
-        staging(options) {
+        staging(<%= mongodb !== 'no' ? 'options' : '' %>) {
 <% if (mongodb !== 'no') { -%>
             const { mongorestore } = options;
 <% } -%>

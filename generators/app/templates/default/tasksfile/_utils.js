@@ -65,8 +65,10 @@ module.exports = {
     help,
     DAY,
     Command,
+<% if (mongodb !== 'no') { -%>
     DROPBOX_DUMP_DIR,
     lastFileCommand,
     getDropboxLastDumpName,
     getLastDumpName,
+<% } -%>
 };
