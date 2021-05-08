@@ -8,6 +8,7 @@
         ],
         "sourceMap": true,
         "incremental": true,
+        "experimentalDecorators": true,
         /* Strict Type-Checking Options */
         "strict": true,
         /* Additional Checks */
@@ -23,6 +24,7 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "baseUrl": ".",
+        "esModuleInterop": true,
         "paths": {
             "@common/*": ["common/src/*"]
         }

@@ -1,7 +1,7 @@
 import type { AxiosError } from 'axios';
 import axios from 'axios';
 import 'axios-debug-log';
-import * as config from 'config';
+import config from 'config';
 import db from './instance';
 
 import { createLogger } from '@common/Logger';

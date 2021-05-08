@@ -1,4 +1,4 @@
-import * as config from 'config';
+import config from 'config';
 import * as mongoose from 'mongoose';
 import beautifyUnique = require('mongoose-beautiful-unique-validation');
 import cachegoose = require('cachegoose');

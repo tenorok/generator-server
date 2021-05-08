@@ -1,5 +1,5 @@
 import * as path from 'path';
-import * as config from 'config';
+import config from 'config';
 import express = require('express');
 import MigrateMongoose = require('migrate-mongoose');
 import findLast = require('lodash/findLast');

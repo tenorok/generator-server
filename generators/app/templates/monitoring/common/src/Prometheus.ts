@@ -1,5 +1,5 @@
 import * as client from 'prom-client';
-import * as config from 'config';
+import config from 'config';
 import express = require('express');
 
 import { createLogger } from './Logger';
