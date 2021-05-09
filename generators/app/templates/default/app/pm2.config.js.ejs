@@ -1,8 +1,12 @@
 module.exports = {
     apps: [{
         name: '<%= project %>',
-        script: 'dist/src/index.js',
+        script: 'dist/app/src/index.js',
         max_memory_restart: '256M',
+<% if (server) { -%>
+        wait_ready: true,
+        kill_timeout: 3000,
+<% } -%>
         env_development: {
             watch: ['dist'],
             watch_options: {

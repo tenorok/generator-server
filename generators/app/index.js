@@ -33,6 +33,12 @@ module.exports = class extends Generator {
                 name: 'monitoring',
                 message: 'Prometheus + Grafana?',
                 default: true
+            },
+            {
+                type: 'confirm',
+                name: 'server',
+                message: 'Express server?',
+                default: true
             }
         ];
 
@@ -120,7 +126,7 @@ module.exports = class extends Generator {
             },
         };
 
-        if (this.answers.mongodb !== 'no' || this.answers.monitoring) {
+        if (this.answers.mongodb !== 'no' || this.answers.monitoring || this.answers.server) {
             packages.dependencies = {
                 ...packages.dependencies,
                 "express": "4.16.4",
@@ -156,6 +162,13 @@ module.exports = class extends Generator {
             packages.dependencies = {
                 ...packages.dependencies,
                 "prom-client": "13.1.0",
+            };
+        }
+
+        if (this.answers.server) {
+            packages.dependencies = {
+                ...packages.dependencies,
+                "@godaddy/terminus": "4.7.2",
             };
         }
 

@@ -47,10 +47,10 @@ services:
       - MONGO_PORT_27017_TCP_PORT=27017
       - MONGO_DB_NAME=<%= project %>
       - MIGRATOR_HOST=http://<%= project %>-migrator
-<% } -%>
     depends_on:
       - <%= project %>-mongo
       - <%= project %>-migrator
+<% } -%>
     networks:
       - <%= project %>-network
     restart: always

@@ -10,17 +10,17 @@ const {
 } = require('./_utils');
 const moment = require('moment');
 
-const IMAGE_APP = 'registry.gitlab.com/tenorok/test-project';
-const IMAGE_MIGRATOR = 'registry.gitlab.com/tenorok/test-project/migrator';
-const IMAGE_NGINX = 'registry.gitlab.com/tenorok/test-project/nginx';
-const IMAGE_MONGO = 'registry.gitlab.com/tenorok/test-project/mongo';
-const IMAGE_FLUENTD = 'registry.gitlab.com/tenorok/test-project/fluentd';
-const IMAGE_PROMETHEUS = 'registry.gitlab.com/tenorok/test-project/prometheus';
+const IMAGE_APP = 'registry.gitlab.com/tenorok/<%= project %>';
+const IMAGE_NGINX = 'registry.gitlab.com/tenorok/<%= project %>/nginx';
+const IMAGE_MONGO = 'registry.gitlab.com/tenorok/<%= project %>/mongo';
+const IMAGE_MIGRATOR = 'registry.gitlab.com/tenorok/<%= project %>/migrator';
+const IMAGE_FLUENTD = 'registry.gitlab.com/tenorok/<%= project %>/fluentd';
+const IMAGE_PROMETHEUS = 'registry.gitlab.com/tenorok/<%= project %>/prometheus';
 const IMAGES = [
     IMAGE_APP,
-    IMAGE_MIGRATOR,
     IMAGE_NGINX,
     IMAGE_MONGO,
+    IMAGE_MIGRATOR,
     IMAGE_FLUENTD,
     IMAGE_PROMETHEUS,
 ];
@@ -44,6 +44,13 @@ const docker = {
         sh('tsc -p app/tsconfig.json');
         sh(`docker build --squash -t ${IMAGE_APP} -f app/Dockerfile .`);
     },
+    nginx() {
+        sh(`docker build --squash -t ${IMAGE_NGINX} ./nginx`);
+    },
+<% if (mongodb !== 'no') { -%>
+    mongo() {
+        sh(`docker build --squash -t ${IMAGE_MONGO} ./mongo`);
+    },
     migrator() {
         prepareNodeModules();
 
@@ -51,12 +58,7 @@ const docker = {
         sh('tsc -p migrator/tsconfig.json');
         sh(`docker build --squash -t ${IMAGE_MIGRATOR} -f migrator/Dockerfile .`);
     },
-    nginx() {
-        sh(`docker build --squash -t ${IMAGE_NGINX} ./nginx`);
-    },
-    mongo() {
-        sh(`docker build --squash -t ${IMAGE_MONGO} ./mongo`);
-    },
+<% } -%>
     fluentd() {
         sh(`docker build --squash -t ${IMAGE_FLUENTD} ./fluentd`);
     },
@@ -67,9 +69,11 @@ const docker = {
         prepareNodeModules();
 
         docker.image.app();
-        docker.image.migrator();
         docker.image.nginx();
+<% if (mongodb !== 'no') { -%>
         docker.image.mongo();
+        docker.image.migrator();
+<% } -%>
         docker.image.fluentd();
         docker.image.prometheus();
     },
@@ -197,15 +201,17 @@ const docker = {
 };
 
 help(docker.app, 'Build main app docker image');
-help(docker.migrator, 'Build migrator docker image');
 help(docker.nginx, 'Build nginx docker image');
+<% if (mongodb !== 'no') { -%>
 help(docker.mongo, 'Build mongo docker image');
+help(docker.migrator, 'Build migrator docker image');
+<% } -%>
 help(docker.fluentd, 'Build fluentd docker image');
 help(docker.prometheus, 'Build prometheus docker image');
 help(docker.all, 'Build all docker images');
 help(docker.compose.dev, 'Run docker-compose with development config', {
     options: {
-        build: 'Build images before run compose',
+        build: 'Build app image before run compose',
     },
 });
 help(

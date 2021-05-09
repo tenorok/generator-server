@@ -11,6 +11,11 @@ const log = createLogger('unhandledRejection');
 process.on('unhandledRejection', (error) => {
     log.error(error);
 });
+<% if (server) { -%>
+
+import { createServer } from './server';
+createServer();
+<% } -%>
 
 // Application code...
 <% if (monitoring) { -%>

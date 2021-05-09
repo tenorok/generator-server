@@ -1,6 +1,7 @@
 node_modules
 node_modules_production
 dist
+*.tsbuildinfo
 docker/secrets/dev/*
 !docker/secrets/dev/.gitkeep
 docker/secrets/prod/*

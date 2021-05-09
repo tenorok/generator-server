@@ -18,6 +18,8 @@ services:
 <% } -%>
   <%= project %>:
     command: ./node_modules/.bin/pm2-runtime start pm2.config.js --env development
+    ports: # порт торчит наружу, чтобы можно было открыть приложение на localhost
+      - "4001:4001"
     volumes:
       - ../app/dist:/var/<%= project %>/dist:ro
     environment:
