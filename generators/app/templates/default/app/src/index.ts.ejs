@@ -21,5 +21,9 @@ createServer();
 <% if (monitoring) { -%>
 
 // Мониторинг должен подключаться строго в конце.
-import '@common/Prometheus';
+// Он актуален только для препродакшена и продакшена.
+import { createPrometheus } from '@common/Prometheus';
+if (process.env.NODE_ENV !== 'development') {
+    createPrometheus();
+}
 <% } -%>
