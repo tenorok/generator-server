@@ -1,0 +1,4 @@
+!docker/secrets/dev/.gitkeep
+docker/secrets/prod/*
+!docker/secrets/prod/.gitkeep
+__codegen__

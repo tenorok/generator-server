@@ -3,3 +3,6 @@ dist
 <% if (mongodb !== 'no') { -%>
 migrator/template.ts
 <% } -%>
+<% if (monorepo) { -%>
+.eslintrc.js
+<% } -%>
