@@ -12,15 +12,19 @@ const moment = require('moment');
 
 const IMAGE_APP = 'registry.gitlab.com/tenorok/<%= project %>';
 const IMAGE_NGINX = 'registry.gitlab.com/tenorok/<%= project %>/nginx';
+<% if (mongodb !== 'no') { -%>
 const IMAGE_MONGO = 'registry.gitlab.com/tenorok/<%= project %>/mongo';
 const IMAGE_MIGRATOR = 'registry.gitlab.com/tenorok/<%= project %>/migrator';
+<% } -%>
 const IMAGE_FLUENTD = 'registry.gitlab.com/tenorok/<%= project %>/fluentd';
 const IMAGE_PROMETHEUS = 'registry.gitlab.com/tenorok/<%= project %>/prometheus';
 const IMAGES = [
     IMAGE_APP,
     IMAGE_NGINX,
+<% if (mongodb !== 'no') { -%>
     IMAGE_MONGO,
     IMAGE_MIGRATOR,
+<% } -%>
     IMAGE_FLUENTD,
     IMAGE_PROMETHEUS,
 ];
@@ -37,8 +41,10 @@ function prepareNodeModules() {
 }
 
 const docker = {
-    app() {
-        prepareNodeModules();
+    app(needPrepareNodeModules = true) {
+        if (needPrepareNodeModules) {
+            prepareNodeModules();
+        }
 
         sh('rm -rf app/dist');
         sh('tsc -p app/tsconfig.json');
@@ -51,8 +57,10 @@ const docker = {
     mongo() {
         sh(`docker build --squash -t ${IMAGE_MONGO} ./mongo`);
     },
-    migrator() {
-        prepareNodeModules();
+    migrator(needPrepareNodeModules = true) {
+        if (needPrepareNodeModules) {
+            prepareNodeModules();
+        }
 
         sh('rm -rf migrator/dist');
         sh('tsc -p migrator/tsconfig.json');
@@ -68,21 +76,21 @@ const docker = {
     all() {
         prepareNodeModules();
 
-        docker.image.app();
-        docker.image.nginx();
+        docker.app(false);
+        docker.nginx();
 <% if (mongodb !== 'no') { -%>
-        docker.image.mongo();
-        docker.image.migrator();
+        docker.mongo();
+        docker.migrator(false);
 <% } -%>
-        docker.image.fluentd();
-        docker.image.prometheus();
+        docker.fluentd();
+        docker.prometheus();
     },
     compose: {
         dev(options) {
             const { build } = options;
 
             if (build) {
-                docker.app();
+                docker.all();
             }
 
             sh(
@@ -141,7 +149,7 @@ const docker = {
         });
     },
     push() {
-        docker.app();
+        docker.all();
 
         const tag = moment().format('DD.MM.YYYY-HH.mm');
         IMAGES.forEach((image) => {
