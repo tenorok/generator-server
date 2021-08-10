@@ -33,9 +33,9 @@ const test = {
         }
 
         cmd.push(
-            'NODE_ENV=testing chokidar',
-            `"src/**/*.ts" "${mask}"`,
-            `-c "run test --reporter=dot ${path}"`,
+            'chokidar',
+            `"app/src/**/*.ts" "${mask}"`,
+            `-c "task test --reporter=dot ${path}"`,
             '--initial',
         );
 
