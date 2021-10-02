@@ -26,14 +26,14 @@ module.exports = class extends Generator {
             },
             {
                 type: 'confirm',
-                name: 'monitoring',
-                message: 'Prometheus + Grafana?',
+                name: 'server',
+                message: 'Express server?',
                 default: true
             },
             {
                 type: 'confirm',
-                name: 'server',
-                message: 'Express server?',
+                name: 'monitoring',
+                message: 'Prometheus + Grafana?',
                 default: true
             },
             {
@@ -85,7 +85,7 @@ module.exports = class extends Generator {
     }
 
     end() {
-        this.spawnCommandSync('git', ['add', '--all']);
+        this.spawnCommandSync('git', ['add', '.']);
 
         const message = this.answers.monorepo ? `Добавлен пакет ${this.answers.project}.` : 'Поехали!';
         this.spawnCommandSync('git', ['commit', '-m', message, '--quiet']);

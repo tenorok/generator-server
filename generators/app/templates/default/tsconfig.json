@@ -6,6 +6,9 @@
         "lib": [
             "es2019"
         ],
+<% if (monorepo) { -%>
+        "declaration": true,
+<% } -%>
         "sourceMap": true,
         "incremental": true,
         "experimentalDecorators": true,
