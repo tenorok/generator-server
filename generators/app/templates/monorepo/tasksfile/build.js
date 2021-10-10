@@ -19,6 +19,8 @@ const build = {
         sh('rm -rf app/dist');
         sh('tsc -p app/tsconfig.json');
         sh('cp -r config/ app/dist/config/');
+        sh('mkdir -p app/dist/docker/secrets/');
+        sh('cp -r docker/secrets/stub.js app/dist/docker/secrets/get.js');
         sh('cp package.json app/dist/package.json');
         relocateLocalDependencies('../app/dist/package.json');
     },
