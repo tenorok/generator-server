@@ -1,0 +1,14 @@
+{
+    "fileExtensions": [
+        "ts",
+        "tsx"
+    ],
+    "excludeRegExp": [
+        "__codegen__"
+    ],
+    "detectiveOptions": {
+        "ts": {
+            "skipTypeImports": true
+        }
+    }
+}
