@@ -25,6 +25,14 @@
         "email": "mail@tenorok.ru",
         "homepage": "https://tenorok.ru"
     },
+<% if (monorepo) { -%>
+    "monorepo": {
+        "name": "@monorepo",
+        "dependencies": {
+            "package": "../package/app/dist/",
+        }
+    },
+<% } -%>
 <% if (mongodb !== 'no') { -%>
     "config": {
         "migration": 0

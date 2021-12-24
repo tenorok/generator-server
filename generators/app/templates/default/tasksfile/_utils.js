@@ -35,7 +35,6 @@ class Command {
 
 <% if (mongodb !== 'no') { -%>
 const os = require('os');
-const config = require('config');
 const DROPBOX_DUMP_DIR = `${os.homedir()}/Dropbox/<%= project %>/app-mongobackup`;
 
 function lastFileCommand(dir) {
@@ -51,6 +50,8 @@ function getDropboxLastDumpName() {
 
 /** Получить имя последнего дампа БД на сервере. */
 function getLastDumpName() {
+    const config = require('config');
+
     const { dumpsdir } = config.get('server');
 
     return sh(lastFileCommand(dumpsdir), {

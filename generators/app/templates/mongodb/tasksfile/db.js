@@ -1,4 +1,3 @@
-const config = require('config');
 const {
     sh,
     help,
@@ -10,6 +9,8 @@ const migration = require('../migrator/runfile/migration');
 const db = {
     dump: {
         create(options, backupFileName) {
+            const config = require('config');
+
             const { dumpsdir } = config.get('server');
             const {
                 dir = dumpsdir,
@@ -29,6 +30,8 @@ const db = {
             sh(cmd.join(' '));
         },
         get(options) {
+            const config = require('config');
+
             const {
                 dropbox,
                 restore,

@@ -1,31 +1,52 @@
 const { sh, help } = require('./_utils');
 
-/**
- * Замена базового пути до локальных зависимостей, чтобы при
- * установке текущего пакета корректно зарезолвились его
- * зависимости внутри node_modules того пакета, в который он устанавливается.
- */
-function relocateLocalDependencies(filePath) {
-    const packageJson = require(filePath);
-    const deps = packageJson.localDependencies;
-    for (let name in deps) {
-        deps[name] = deps[name].replace(/app\/dist\/$/, '');
+function installMonorepoDeps(packageJSONPath, options = {}) {
+    const {
+        prefixTo = './',
+    } = options;
+    const packageJson = require(packageJSONPath);
+    const { monorepo: { name, dependencies }} = packageJson;
+    const dirTo = `${prefixTo}node_modules/${name}`;
+
+    sh(`rm -rf ${dirTo}`);
+    sh(`mkdir -p ${dirTo}`);
+
+    for (let to in dependencies) {
+        const from = dependencies[to];
+        sh(`cp -r ${from} ${dirTo}/${to}`);
     }
-    fs.writeFileSync(path.join(__dirname, filePath), JSON.stringify(packageJson, null, 4));
 }
 
 const build = {
-    default() {
+    default(options) {
+        const { deps } = options;
+
+        if (deps) {
+            sh('rm -rf node_modules');
+            sh('npm ci');
+            installMonorepoDeps('../package.json');
+        }
+    },
+    dist() {
+        build.default({});
         sh('rm -rf app/dist');
         sh('tsc -p app/tsconfig.json');
         sh('cp -r config/ app/dist/config/');
-        sh('mkdir -p app/dist/docker/secrets/');
-        sh('cp -r docker/secrets/stub.js app/dist/docker/secrets/get.js');
-        sh('cp package.json app/dist/package.json');
-        relocateLocalDependencies('../app/dist/package.json');
+        sh('cp -r docker/ app/dist/docker/');
+        sh('cp package.json app/dist/');
+        sh('cp package-lock.json app/dist/');
+        sh('npm ci --production --prefix app/dist/ ./app/dist/');
+        installMonorepoDeps('../app/dist/package.json', {
+            prefixTo: 'app/dist/',
+        });
     },
 };
 
-help(build.default, 'Build app for using by another packages');
+help(build.default, 'Build app', {
+    options: {
+        deps: 'Reinstall node modules',
+    },
+});
+help(build.dist, 'Build app for using by another packages');
 
 module.exports = build;

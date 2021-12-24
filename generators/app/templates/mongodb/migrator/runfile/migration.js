@@ -1,12 +1,8 @@
 const { sh, help } = require('../../tasksfile/_utils');
 const fs = require('fs');
 const path = require('path');
-const signale = require('signale');
-const chalk = require('chalk');
-const MigrateMongoose = require('migrate-mongoose');
 
 process.env.NODE_CONFIG_DIR = path.resolve(__dirname, '..', '..', 'config');
-const config = require('config');
 
 const packagejsonPath = path.resolve(__dirname, '..', '..', 'package.json');
 const packagejson = require(packagejsonPath);
@@ -44,6 +40,11 @@ start.watch = function() {
 
 const migration = {
     create() {
+        const config = require('config');
+        const signale = require('signale');
+        const chalk = require('chalk');
+        const MigrateMongoose = require('migrate-mongoose');
+
         const version = incrementPackagejsonMigration();
         const host = config.get('mongodb.host');
         const port = config.get('mongodb.port');

@@ -8,7 +8,6 @@ const {
     getLastDumpName,
 <% } -%>
 } = require('./_utils');
-const moment = require('moment');
 
 const IMAGE_APP = 'registry.gitlab.com/tenorok/<%= project %>';
 const IMAGE_NGINX = 'registry.gitlab.com/tenorok/<%= project %>/nginx';
@@ -149,6 +148,8 @@ const docker = {
         });
     },
     push() {
+        const moment = require('moment');
+
         docker.all();
 
         const tag = moment().format('DD.MM.YYYY-HH.mm');
