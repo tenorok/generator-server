@@ -3,6 +3,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
     "search.exclude": {
-        ".next": true
+        ".next": true,
+        "app/dist": true
     }
 }
