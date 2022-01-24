@@ -13,9 +13,10 @@ const test = {
 
         cmd.push(
             'NODE_ENV=testing mocha',
-            '--require error-stack-handler',
+            '--require source-map-support/register', // Обязательно должно идти первым, иначе ломаются карты кода
+            '--require ts-node/register',
+            '--require tsconfig-paths/register',
             '--recursive',
-            '--compilers ts:ts-node/register,tsconfig-paths/register',
             `${reporterFlag} ${path}`,
         );
 
