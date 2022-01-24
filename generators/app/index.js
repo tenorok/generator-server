@@ -119,6 +119,7 @@ module.exports = class extends Generator {
                 "chai-shallow-deep-equal": "1.4.6",
                 "chalk": "2.4.1",
                 "chokidar-cli": "2.1.0",
+                "deepdash": "5.3.9",
                 "mocha": "3.4.2",
                 "moment": "2.29.1",
                 "nock": "12.0.2",

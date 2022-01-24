@@ -4,19 +4,27 @@ const assert = chai.assert;
 const sinon = require('sinon');
 const mongoose = require('mongoose');
 const cachegoose = require('cachegoose');
+const _ = require('lodash');
+require('deepdash')(_);
 const db = require('../common/src/DB/instance').default;
 db.cacheTTL = 0;
 
-const modelsAndCollections = [
-    ['user', 'users'],
-];
-
 describe('DB', () => {
+    let models;
+
     before(() => {
         if (!db.connection.db) {
             // Дожидаемся появления db.connection.db
             return new Promise((resolve) => {
-                db.connection.on('open', resolve);
+                db.connection.on('open', async () => {
+                    // Дожидаемся создания моделей.
+                    models = await Promise.all(
+                        _.mapDeep(db.models, (model) => model, {
+                            leavesOnly: true,
+                        }),
+                    );
+                    resolve();
+                });
             });
         }
     });
@@ -25,19 +33,24 @@ describe('DB', () => {
         // Вызов model.syncIndexes() в BaseModel.prototype.create() создаёт коллекцию
         // поэтому в первом beforeEach() коллекции повторно создавать нельзя.
         const dbCollections = await db.connection.db.listCollections().toArray();
-        for (const [modelName, collectionName] of modelsAndCollections) {
-            if (!dbCollections.find((collection) => collection.name === collectionName)) {
+        for (const model of models) {
+            const collectionName = model.collection.collectionName;
+            if (
+                !dbCollections.find(
+                    (collection) => collection.name === collectionName,
+                )
+            ) {
                 await db.connection.createCollection(collectionName);
             }
 
             // Нужно пересчитать индексы для сброса предыдущего состояния.
-            await (await db.models[modelName]).syncIndexes();
+            await model.syncIndexes();
         }
     });
 
     afterEach(async () => {
-        for (const [, collectionName] of modelsAndCollections) {
-            await db.connection.dropCollection(collectionName);
+        for (const model of models) {
+            await db.connection.dropCollection(model.collection.collectionName);
         }
         await new Promise((resolve) => {
             cachegoose.clearCache(null, resolve);
