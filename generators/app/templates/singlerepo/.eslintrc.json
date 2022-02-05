@@ -55,6 +55,10 @@
                 "@typescript-eslint/no-empty-interface": "off",
                 "no-duplicate-imports": "off",
                 "@typescript-eslint/no-duplicate-imports": ["error"],
+                "@typescript-eslint/no-unused-vars": ["error", {
+                    "argsIgnorePattern": "^_",
+                    "ignoreRestSiblings": true
+                }],
                 "@typescript-eslint/unbound-method": ["error", { "ignoreStatic": true }],
                 "@typescript-eslint/member-delimiter-style": ["error"],
                 "@typescript-eslint/member-ordering": ["error"],
