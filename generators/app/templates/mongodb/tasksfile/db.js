@@ -4,7 +4,7 @@ const {
     lastFileCommand,
     DROPBOX_DUMP_DIR,
 } = require('./_utils');
-const migration = require('../migrator/runfile/migration');
+const migration = require('../migrator/tasksfile/migration');
 
 const db = {
     dump: {
