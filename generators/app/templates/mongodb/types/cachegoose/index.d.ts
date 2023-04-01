@@ -14,7 +14,7 @@ declare module 'cachegoose' {
 }
 
 declare module 'mongoose' {
-    interface DocumentQuery {
+    interface Query {
         cache(ttl?: number | null, customKey?: string): this;
         getCacheKey(): string;
     }

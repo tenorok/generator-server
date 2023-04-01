@@ -12,12 +12,24 @@ const test = {
         }
 
         cmd.push(
+            // Чтобы прокинуть ошибочный exitcode на выход,
+            // не смотря на красивый вывод через bunyan.
+            'set -o pipefail &&',
+
             'NODE_ENV=testing mocha',
-            '--require source-map-support/register', // Обязательно должно идти первым, иначе ломаются карты кода
-            '--require ts-node/register',
+
+            // Обязательно должно идти первым, иначе ломаются карты кода
+            '--require source-map-support/register',
+
+            '--require ../../node_modules/ts-node/register',
             '--require tsconfig-paths/register',
+
+            // Должно быть в конце, чтобы фильтровался стек ошибок.
+            '--require @empire/common/modules/error-stack-cleaner/register',
+
             '--recursive',
             `${reporterFlag} ${path}`,
+            '| ./node_modules/.bin/bunyan --time local',
         );
 
         sh(cmd.join(' '));

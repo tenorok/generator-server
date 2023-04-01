@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 declare module 'mongoose-lean-defaults' {
-    import type { Schema } from 'mongoose';
+    import type { Schema, Document, Model } from 'mongoose';
 
-    const Plugin: (schema: Schema) => void;
+    const Plugin: <D extends Document>(schema: Schema<D, Model<D>>) => void;
     export = Plugin;
 }
 

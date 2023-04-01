@@ -7,7 +7,7 @@ export default abstract class BaseModel<Doc extends Document> {
     /** Имя модели. */
     protected abstract name: string;
     /** Схема модели. */
-    protected abstract schema: Schema;
+    protected abstract schema: Schema<Doc>;
     /** Имя коллекции. */
     protected abstract collection: string;
 

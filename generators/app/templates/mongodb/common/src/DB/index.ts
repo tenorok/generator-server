@@ -1,5 +1,5 @@
 import config from 'config';
-import * as mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import beautifyUnique = require('mongoose-beautiful-unique-validation');
 import cachegoose = require('cachegoose');
 import type { IUser, IUserModel } from './models/User';
@@ -45,9 +45,9 @@ export default class DB {
     }
 
     public async destructor(): Promise<[void, void | Error]> {
-        return Promise.all<void, void | Error>([
+        return Promise.all([
             this.connection.close(),
-            new Promise((resolve) => {
+            new Promise<void | Error>((resolve) => {
                 cachegoose.clearCache(null, resolve);
             }),
         ]);
@@ -81,10 +81,6 @@ export default class DB {
     private connect(host: string, port: string, db: string): mongoose.Connection {
         const connection = mongoose.createConnection(`mongodb://${host}:${port}/${db}`, {
 
-            // Переподключение выполняется только после изначально успешного подключения.
-            reconnectInterval: 1000, // Каждую секунду
-            reconnectTries: 60 * 5, // на протяжении пяти минут.
-
             // @ts-ignore
             loggerLevel: isDevelopment ? 'info' : 'error',
 
@@ -94,6 +90,10 @@ export default class DB {
             // Опции для перехода с устаревших методов.
             useNewUrlParser: true,
             useFindAndModify: false,
+
+            // Переход на вечно подключенное состояние.
+            // http://mongodb.github.io/node-mongodb-native/3.3/reference/unified-topology/
+            useUnifiedTopology: true,
         });
 
         connection

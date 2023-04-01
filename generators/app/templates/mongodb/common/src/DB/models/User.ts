@@ -1,6 +1,5 @@
 import type { SetOptional } from 'type-fest';
-import type { MongoError } from 'mongodb';
-import type { Document, NativeError } from 'mongoose';
+import type { Document, Query, NativeError } from 'mongoose';
 import { Schema } from 'mongoose';
 import cachegoose = require('cachegoose');
 import mongooseLeanDefaults = require('mongoose-lean-defaults');
@@ -26,7 +25,7 @@ export interface IUserModel extends Document {
     updatedAt: Date;
 }
 
-const userSchema: Schema = new Schema({
+const userSchema: Schema<IUserModel> = new Schema({
     clientId: {
         type: String,
     },
@@ -39,31 +38,33 @@ const userSchema: Schema = new Schema({
 
 userSchema.plugin(mongooseLeanDefaults);
 
-userSchema.pre<SetOptional<IUserModel, 'clientId'>>('save', function(next: Next): void {
-    if (this.isNew) {
-        this.clientId = uuidv4();
-    }
-    next();
-}, (err?: Error) => {
-    log.error(err);
-});
+userSchema.pre<SetOptional<IUserModel, 'clientId'>>(
+    'save',
+    { document: true },
+    function (next: Next): void {
+        if (this.isNew) {
+            this.clientId = uuidv4();
+        }
+        next();
+    },
+);
 
-userSchema.post<IUserModel>('save', (user: IUserModel, next: (err?: NativeError) => void) => {
-    cachegoose.clearCache(getByIdCacheKey(user.id));
+userSchema.post<IUserModel>('save', (user: IUserModel, next: Next) => {
+    cachegoose.clearCache(getByIdCacheKey(user.id as ObjectId));
     next();
 });
-userSchema.post<IUserModel>('save', (err: MongoError, _: IUserModel, next: Next) => {
+userSchema.post<IUserModel>('save', (err: NativeError, _: IUserModel, next: Next) => {
     log.error(err);
     next(err);
 });
 
-userSchema.post<IUserModel>('findOneAndUpdate', (user: IUserModel | null, next: (err?: NativeError) => void) => {
+userSchema.post<Query<IUserModel, IUserModel>>('findOneAndUpdate', (user: IUserModel | null, next: Next) => {
     if (user) {
-        cachegoose.clearCache(getByIdCacheKey(user.id));
+        cachegoose.clearCache(getByIdCacheKey(user.id as ObjectId));
     }
     next();
 });
-userSchema.post<IUserModel>('findOneAndUpdate', (err: MongoError, _: IUserModel, next: Next) => {
+userSchema.post<Query<IUserModel, IUserModel>>('findOneAndUpdate', (err: NativeError, _: IUserModel, next: Next) => {
     log.error(err);
     next(err);
 });

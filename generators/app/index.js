@@ -12,12 +12,12 @@ module.exports = class extends Generator {
             {
                 name: 'nodejs',
                 message: 'NodeJS version:',
-                default: '12.18.3',
+                default: '16.18.1',
             },
             {
                 name: 'npm',
                 message: 'NPM version:',
-                default: '6.14.6',
+                default: '8.19.2',
             },
             {
                 name: 'mongodb',
@@ -81,10 +81,15 @@ module.exports = class extends Generator {
     }
 
     install() {
-        this.npmInstall();
+        this.spawnCommandSync('npm', ['install']);
+
+        if (this.answers.monorepo) {
+            this.spawnCommandSync('task', ['build', '--deps=monorepo']);
+        }
     }
 
     end() {
+        this.spawnCommandSync('npx prettier', ['--write', '.']);
         this.spawnCommandSync('git', ['add', '.']);
 
         const message = this.answers.monorepo ? `Добавлен пакет ${this.answers.project}.` : 'Поехали!';
@@ -153,18 +158,17 @@ module.exports = class extends Generator {
                 ...packages.dependencies,
                 "axios": "0.19.2",
                 "axios-debug-log": "0.6.2",
-                "mongoose": "5.7.13",
+                "mongoose": "5.13.14",
                 "mongoose-beautiful-unique-validation": "7.1.1",
-                "mongoose-lean-defaults": "0.3.2",
+                "mongoose-lean-defaults": "1.0.1",
                 "migrate-mongoose": "git+https://github.com/tenorok/migrate-mongoose.git#template-file-var",
-                "cachegoose": "github:tenorok/cachegoose#8.0.0",
+                "cachegoose": "github:tenorok/cachegoose#8.0.1",
                 "uuid": "8.0.0",
             };
 
             packages.devDependencies = {
                 ...packages.devDependencies,
                 "@types/axios": "0.14.0",
-                "@types/mongoose": "5.7.13",
                 "@types/uuid": "7.0.3",
             };
 
@@ -181,21 +185,6 @@ module.exports = class extends Generator {
             packages.dependencies = {
                 ...packages.dependencies,
                 "@godaddy/terminus": "4.7.2",
-            };
-        }
-
-        if (!this.answers.monorepo) {
-            packages.devDependencies = {
-                ...packages.devDependencies,
-                "@typescript-eslint/eslint-plugin": "4.21.0",
-                "@typescript-eslint/parser": "4.21.0",
-                "eslint": "7.23.0",
-                "eslint-plugin-ascii": "1.0.0",
-                "eslint-plugin-mocha": "5.0.0",
-                "husky": "4.3.6",
-                "lint-staged": "10.5.3",
-                "madge": "4.0.2",
-                "prettier": "2.2.1",
             };
         }
 
